@@ -37,7 +37,8 @@ def executar(argv):
         falhas += 1
         log("ERRO geral:\n" + traceback.format_exc())
     log(f"RESULTADO: {'tudo certo' if not falhas else f'{falhas} falha(s)'}")
-    sys.stdout.flush()
+    if sys.stdout:                  # no executável sem console, stdout é None
+        sys.stdout.flush()
     codigo = 1 if falhas else 0
     if sys.platform == "win32":     # sai sem descarregar as DLLs (o Windows OCR às vezes trava na descarga)
         import ctypes

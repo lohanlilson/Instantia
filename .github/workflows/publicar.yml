@@ -78,7 +78,8 @@ jobs:
         env:
           INSTANTIA_TESTE_GRAVACAO: "1"
         run: |
-          $p = Start-Process -FilePath "dist\Instantia\Instantia.exe" -ArgumentList "--selftest","selftest.txt" -PassThru; $p.WaitForExit()
+          $p = Start-Process -FilePath "dist\Instantia\Instantia.exe" -ArgumentList "--selftest","selftest.txt" -PassThru
+          if (-not $p.WaitForExit(600000)) { Get-Content selftest.txt; $p | Stop-Process -Force; Write-Error "Autoteste travou"; exit 1 }
           Get-Content selftest.txt
           if ($p.ExitCode -ne 0) { Write-Error "Autoteste do executável falhou"; exit 1 }
 
@@ -95,7 +96,8 @@ jobs:
           $key = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\{8CFC6425-FE9E-43F3-B780-04DB19E19F23}_is1"
           $dir = (Get-ItemProperty $key).InstallLocation
           Write-Host "Instalado em $dir — versão $((Get-ItemProperty $key).DisplayVersion)"
-          $p = Start-Process (Join-Path $dir "Instantia.exe") -ArgumentList "--selftest","selftest-instalado.txt" -PassThru; $p.WaitForExit()
+          $p = Start-Process (Join-Path $dir "Instantia.exe") -ArgumentList "--selftest","selftest-instalado.txt" -PassThru
+          if (-not $p.WaitForExit(600000)) { Get-Content selftest-instalado.txt; $p | Stop-Process -Force; throw "Autoteste travou" }
           Get-Content selftest-instalado.txt
           if ($p.ExitCode -ne 0) { throw "Autoteste do programa instalado falhou" }
           $p = Start-Process (Join-Path $dir "unins000.exe") -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES' -PassThru; $p.WaitForExit()
