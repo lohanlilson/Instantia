@@ -56,7 +56,6 @@ jobs:
         if: steps.versao.outputs.publicar == 'sim'
         shell: bash
         env:
-          QT_QPA_PLATFORM: offscreen
           PYTHONIOENCODING: utf-8
           INSTANTIA_TESTE_GRAVACAO: "1"
         run: |
