@@ -1,7 +1,6 @@
 """Identidade visual do Instantia (mesma família do Dispersio PDF e do Convergio).
 
-Marca: os quatro cantos de vidro de um visor (a área escolhida) com um clarão de luz violeta, azul e dourada
-no centro — o instante da captura.
+Marca: a área selecionada, em tracejado de vidro, com a cruz do cursor em dourado no canto.
 Gera: logo.png (1024), instantia.png (256), instantia.ico (16–256) e as imagens do instalador.
 """
 import math
@@ -215,8 +214,45 @@ def opcao_instantia():
     return acabar(img)
 
 
+def vidro(img, m, forca_sombra=.65):
+    img.alpha_composite(sombra(m, 26, 18, forca_sombra))
+    g = gradiente((S, S), [(0, (255, 255, 255)), (0.7, (232, 222, 255)), (1, (205, 186, 255))], 90)
+    img.alpha_composite(brilho(preencher(m, (200, 170, 255)), 30, 1))
+    img.alpha_composite(preencher(m, g))
+    img.alpha_composite(preencher(contorno_de(m, 14, .9), (255, 255, 255)))
+
+
+def opcao_area():
+    """Área selecionada (tracejado de vidro) com a cruz do cursor em dourado no canto."""
+    img = fundo()
+    m = Image.new("L", (S, S), 0)
+    d = ImageDraw.Draw(m)
+    x0, y0, x1, y1 = 230, 260, 740, 700
+    w, seg, gap = 44, 70, 44
+    for (a, b, horiz, fixo) in ((x0, x1, True, y0), (x0, x1, True, y1), (y0, y1, False, x0), (y0, y1, False, x1)):
+        t = a
+        while t < b:
+            e = min(t + seg, b)
+            if horiz:
+                d.rectangle(u(t, fixo - w / 2, e, fixo + w / 2), fill=255)
+            else:
+                d.rectangle(u(fixo - w / 2, t, fixo + w / 2, e), fill=255)
+            t += seg + gap
+    vidro(img, arredondar(m, 10 * U))
+    cruz = Image.new("L", (S, S), 0)
+    d = ImageDraw.Draw(cruz)
+    cx, cy = 740, 700
+    d.rectangle(u(cx - 22, cy - 150, cx + 22, cy + 150), fill=255)
+    d.rectangle(u(cx - 150, cy - 22, cx + 150, cy + 22), fill=255)
+    r = Image.new("RGBA", (S, S), (0, 0, 0, 0))
+    r.alpha_composite(preencher(arredondar(cruz, 8 * U), gradiente((S, S), [(0, DOURADO), (1, (255, 120, 90))], 45)))
+    img.alpha_composite(brilho(r, 26, 2))
+    img.alpha_composite(r)
+    return acabar(img)
+
+
 def icone():
-    return opcao_instantia()
+    return opcao_area()
 
 
 if __name__ == "__main__":
