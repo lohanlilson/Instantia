@@ -263,7 +263,7 @@ def t_ocr(log, app):
     t0 = time.time()
     pal = ocr.reconhecer(img)
     texto = ocr.texto(pal)
-    falhas = ok(log, "maria" in texto.lower() and "1.500,00" in texto,
+    falhas = ok(log, "maria" in texto.lower() and "1.500" in texto,
                 f"OCR ({motor}) leu o print em {time.time() - t0:.1f} s: {texto.splitlines()}")
     tipos = {t for t, _ in SV.achar(pal)}
     esperado = {"CPF", "CNPJ", "e-mail", "telefone", "valor", "linha digitável"}

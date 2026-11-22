@@ -66,7 +66,9 @@ PADROES = [
     ("chave PIX", re.compile(r"\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b", re.I), None),
     ("telefone", re.compile(r"(?:\+?55\s?)?\(?\b\d{2}\)?\s?9?\s?\d{4}[-\s]\d{4}\b"), None),
     ("telefone", re.compile(r"(?:\+?55\s?)?\(\d{2}\)\s?9?\d{8}\b"), None),
-    ("valor", re.compile(r"R\s?\$\s?-?\d{1,3}(?:\.\d{3})*(?:,\d{2})?|R\s?\$\s?-?\d+(?:,\d{2})?", re.I), None),
+    ("valor", re.compile(r"R\s?\$\s?-?\d{1,3}(?:\.\d{3})*(?:,[\dOo]{2})?|R\s?\$\s?-?\d+(?:,[\dOo]{2})?", re.I), None),
+    # o OCR às vezes lê "R$" como "RS" ou "R5": aí só vale com centavos ou milhar ("RS 1.500,00")
+    ("valor", re.compile(r"\bR\s?[S5]\s?-?\d{1,3}(?:(?:\.\d{3})+(?:,[\dOo]{2})?|,[\dOo]{2})(?!\d)"), None),
 ]
 
 
