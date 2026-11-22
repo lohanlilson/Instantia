@@ -38,7 +38,13 @@ def executar(argv):
         log("ERRO geral:\n" + traceback.format_exc())
     log(f"RESULTADO: {'tudo certo' if not falhas else f'{falhas} falha(s)'}")
     sys.stdout.flush()
-    os._exit(1 if falhas else 0)
+    codigo = 1 if falhas else 0
+    if sys.platform == "win32":     # sai sem descarregar as DLLs (o Windows OCR às vezes trava na descarga)
+        import ctypes
+        k = ctypes.windll.kernel32
+        k.GetCurrentProcess.restype = ctypes.c_void_p
+        k.TerminateProcess(ctypes.c_void_p(k.GetCurrentProcess()), codigo)
+    os._exit(codigo)
 
 
 def ok(log, cond, msg):
@@ -258,7 +264,7 @@ def t_ocr(log, app):
     pal = ocr.reconhecer(img)
     texto = ocr.texto(pal)
     falhas = ok(log, "maria" in texto.lower() and "1.500,00" in texto,
-                f"OCR ({motor}) leu o print em {time.time() - t0:.1f} s: {texto.splitlines()[:2]}")
+                f"OCR ({motor}) leu o print em {time.time() - t0:.1f} s: {texto.splitlines()}")
     tipos = {t for t, _ in SV.achar(pal)}
     esperado = {"CPF", "CNPJ", "e-mail", "telefone", "valor", "linha digitável"}
     falhas += ok(log, esperado <= tipos, f"dados sensíveis no print: {sorted(tipos)}")
